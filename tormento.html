@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TORMENTO — Vestuario Urbano Reflectante</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --black: #0a0a0a;
+    --deep: #111111;
+    --surface: #1a1a1a;
+    --silver: #c0c0c0;
+    --reflect: #e8e8e8;
+    --white: #ffffff;
+    --muted: #555555;
+    --border: #2a2a2a;
+  }
+  html { scroll-behavior: smooth; }
+  body { background: var(--black); color: var(--white); font-family: 'Inter', sans-serif; font-weight: 300; overflow-x: hidden; cursor: none; }
+
+  /* CURSOR */
+  .cursor { position: fixed; width: 10px; height: 10px; background: var(--silver); border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); transition: width .2s, height .2s; mix-blend-mode: difference; }
+  .cursor-ring { position: fixed; width: 36px; height: 36px; border: 1px solid var(--silver); border-radius: 50%; pointer-events: none; z-index: 9998; transform: translate(-50%,-50%); transition: all .12s ease; mix-blend-mode: difference; }
+
+  /* NAV */
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 20px 48px; display: flex; justify-content: space-between; align-items: center; transition: background .4s, backdrop-filter .4s; }
+  nav.scrolled { background: rgba(10,10,10,.95); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); }
+  .nav-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+  .nav-logo-diamond { width: 22px; height: 22px; flex-shrink: 0; }
+  .nav-logo-text { font-family: 'Bebas Neue', sans-serif; font-size: 26px; letter-spacing: 6px; color: var(--white); }
+  .nav-links { display: flex; gap: 40px; list-style: none; }
+  .nav-links a { color: var(--silver); text-decoration: none; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; transition: color .3s; position: relative; }
+  .nav-links a::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 1px; background: var(--silver); transition: width .3s; }
+  .nav-links a:hover { color: var(--white); }
+  .nav-links a:hover::after { width: 100%; }
+
+  /* HERO */
+  #hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; position: relative; overflow: hidden; }
+  .hero-bg { position: absolute; inset: 0; background: radial-gradient(ellipse 80% 60% at 50% 50%, #1f1f1f 0%, #0a0a0a 100%); }
+  .grid-lines { position: absolute; inset: 0; background-image: linear-gradient(rgba(192,192,192,.03) 1px, transparent 1px), linear-gradient(90deg, rgba(192,192,192,.03) 1px, transparent 1px); background-size: 60px 60px; }
+  .particles { position: absolute; inset: 0; pointer-events: none; }
+  .particle { position: absolute; width: 2px; height: 2px; background: var(--silver); border-radius: 50%; opacity: 0; animation: particleFloat var(--dur) ease-in-out infinite; animation-delay: var(--delay); }
+  @keyframes particleFloat { 0%,100%{opacity:0;transform:translateY(0) scale(1)} 20%{opacity:.8} 80%{opacity:.4} 100%{opacity:0;transform:translateY(-120px) scale(0)} }
+
+  /* LOGO HERO GRANDE */
+  .hero-diamond-wrap { position: relative; z-index: 2; margin-bottom: 32px; opacity: 0; transform: translateY(30px) scale(.8); animation: fadeUpScale .9s ease .2s forwards; }
+  @keyframes fadeUpScale { to { opacity: 1; transform: translateY(0) scale(1); } }
+  .hero-diamond { filter: drop-shadow(0 0 24px rgba(192,192,192,.3)); }
+
+  .hero-eyebrow { font-size: 11px; letter-spacing: 6px; text-transform: uppercase; color: var(--silver); margin-bottom: 24px; opacity: 0; transform: translateY(20px); animation: fadeUp .8s ease .5s forwards; position: relative; z-index: 2; }
+  .hero-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(80px, 16vw, 200px); line-height: .9; letter-spacing: 8px; position: relative; z-index: 2; opacity: 0; transform: translateY(40px); animation: fadeUp 1s ease .7s forwards; }
+  .hero-title .reflect-text { display: block; background: linear-gradient(135deg, #888 0%, #fff 30%, #c0c0c0 50%, #fff 70%, #888 100%); background-size: 300% 300%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; animation: shimmer 4s ease-in-out infinite; }
+  @keyframes shimmer { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
+  .hero-sub { margin-top: 32px; font-size: 13px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); max-width: 400px; line-height: 2; opacity: 0; transform: translateY(20px); animation: fadeUp .8s ease 1.1s forwards; position: relative; z-index: 2; }
+  .hero-cta { margin-top: 48px; display: flex; gap: 16px; opacity: 0; transform: translateY(20px); animation: fadeUp .8s ease 1.3s forwards; position: relative; z-index: 2; }
+  @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+
+  .btn-primary { padding: 14px 40px; background: var(--white); color: var(--black); text-decoration: none; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; font-weight: 600; transition: all .3s; position: relative; overflow: hidden; }
+  .btn-primary::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,.4) 50%, transparent 60%); transform: translateX(-100%); transition: transform .5s; }
+  .btn-primary:hover::before { transform: translateX(100%); }
+  .btn-primary:hover { background: var(--silver); }
+  .btn-outline { padding: 14px 40px; border: 1px solid var(--border); color: var(--silver); text-decoration: none; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; transition: all .3s; }
+  .btn-outline:hover { border-color: var(--silver); color: var(--white); }
+
+  .hero-scroll { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--muted); font-size: 10px; letter-spacing: 3px; text-transform: uppercase; opacity: 0; animation: fadeUp .8s ease 1.8s forwards; z-index: 2; }
+  .scroll-line { width: 1px; height: 40px; background: linear-gradient(to bottom, var(--silver), transparent); animation: scrollPulse 2s ease-in-out infinite; }
+  @keyframes scrollPulse { 0%,100%{opacity:.3;transform:scaleY(1)} 50%{opacity:1;transform:scaleY(1.2)} }
+
+  /* SECCIONES */
+  section { padding: 120px 48px; }
+  .section-eyebrow { font-size: 10px; letter-spacing: 5px; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; display: flex; align-items: center; gap: 16px; }
+  .section-eyebrow::before { content: ''; width: 32px; height: 1px; background: var(--muted); flex-shrink: 0; }
+  .section-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(48px, 7vw, 96px); line-height: 1; letter-spacing: 4px; }
+  .reveal { opacity: 0; transform: translateY(40px); transition: opacity .8s ease, transform .8s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* HISTORIA */
+  #historia { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; max-width: 1200px; margin: 0 auto; }
+  .historia-visual { position: relative; aspect-ratio: 3/4; background: var(--surface); overflow: hidden; }
+  .historia-visual-inner { position: absolute; inset: 0; background: linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 50%, #1a1a1a 100%); }
+  .reflect-sweep { position: absolute; inset: 0; background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,.03) 40%, rgba(255,255,255,.12) 50%, rgba(255,255,255,.03) 60%, transparent 70%); animation: sweep 3s ease-in-out infinite; }
+  @keyframes sweep { 0%{transform:translateX(-100%)} 100%{transform:translateX(100%)} }
+  .historia-visual-label { position: absolute; bottom: 24px; left: 24px; font-family: 'Bebas Neue', sans-serif; font-size: 64px; letter-spacing: 4px; color: rgba(255,255,255,.08); line-height: 1; }
+  /* Logo rombo en la visual */
+  .historia-visual-logo { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); opacity: .15; }
+  .historia-tag { position: absolute; top: 24px; right: 24px; background: var(--black); border: 1px solid var(--border); padding: 8px 16px; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--silver); }
+  .historia-text { color: var(--silver); font-size: 15px; line-height: 1.9; margin-bottom: 24px; }
+  .historia-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); margin-top: 48px; border: 1px solid var(--border); }
+  .stat-item { background: var(--black); padding: 24px; text-align: center; }
+  .stat-number { font-family: 'Bebas Neue', sans-serif; font-size: 48px; letter-spacing: 2px; display: block; background: linear-gradient(135deg, var(--silver), var(--white)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .stat-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); margin-top: 4px; display: block; }
+
+  /* CATÁLOGO */
+  #catalogo { max-width: 1200px; margin: 0 auto; }
+  .catalogo-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 64px; }
+  .catalogo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+  .product-card { position: relative; background: var(--surface); overflow: hidden; cursor: none; }
+  .product-card:first-child { grid-row: span 2; }
+  .product-visual { aspect-ratio: 3/4; background: var(--deep); position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+  .product-card:first-child .product-visual { aspect-ratio: unset; height: 100%; min-height: 600px; }
+  .product-icon { font-family: 'Bebas Neue', sans-serif; font-size: clamp(32px, 5vw, 64px); letter-spacing: 2px; color: rgba(255,255,255,.05); text-align: center; transition: color .4s; line-height: 1.2; }
+  .product-visual::after { content: ''; position: absolute; inset: 0; background: linear-gradient(115deg, transparent 20%, rgba(255,255,255,0) 40%, rgba(255,255,255,.15) 50%, rgba(255,255,255,0) 60%, transparent 80%); transform: translateX(-200%); transition: transform .7s ease; }
+  .product-card:hover .product-visual::after { transform: translateX(200%); }
+  .product-card:hover .product-icon { color: rgba(255,255,255,.12); }
+  .product-info { padding: 20px 24px; background: var(--surface); border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+  .product-name { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--reflect); font-weight: 500; }
+  .product-price { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 1px; color: var(--silver); }
+  .product-badge { position: absolute; top: 16px; left: 16px; padding: 4px 12px; font-size: 9px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; }
+  .product-badge.reflectante { background: var(--silver); color: var(--black); }
+  .product-badge.nuevo { background: var(--white); color: var(--black); }
+  .product-add { position: absolute; bottom: 64px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--white); color: var(--black); border: none; padding: 10px 28px; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; font-weight: 600; opacity: 0; transition: all .3s; white-space: nowrap; cursor: none; }
+  .product-card:hover .product-add { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* LOOKBOOK */
+  #lookbook { background: var(--deep); }
+  .lookbook-inner { max-width: 1200px; margin: 0 auto; }
+  .lookbook-header { margin-bottom: 64px; }
+  .lookbook-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; }
+  .look-item { position: relative; overflow: hidden; background: var(--surface); cursor: none; }
+  .look-item:nth-child(1) { grid-column: span 2; }
+  .look-item:nth-child(4) { grid-column: span 2; }
+  .look-visual { aspect-ratio: 3/4; background: var(--deep); position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+  .look-item:nth-child(1) .look-visual, .look-item:nth-child(4) .look-visual { aspect-ratio: 16/9; }
+  .look-placeholder { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); z-index: 1; }
+  .look-visual::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(255,255,255,.15) 0%, transparent 70%); opacity: 0; transition: opacity .4s; z-index: 2; }
+  .look-item:hover .look-visual::before { opacity: 1; }
+  .look-overlay { position: absolute; inset: 0; background: rgba(0,0,0,.6); opacity: 0; transition: opacity .4s; display: flex; align-items: flex-end; padding: 24px; z-index: 3; }
+  .look-item:hover .look-overlay { opacity: 1; }
+  .look-overlay-text { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--silver); }
+  .look-visual::after { content: ''; position: absolute; inset: 0; background-image: linear-gradient(rgba(192,192,192,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(192,192,192,.04) 1px, transparent 1px); background-size: 40px 40px; }
+  .look-bg-text { font-family: 'Bebas Neue', sans-serif; font-size: clamp(60px, 12vw, 140px); color: rgba(255,255,255,.04); letter-spacing: 4px; position: absolute; z-index: 1; }
+
+  /* CONTACTO */
+  #contacto { max-width: 800px; margin: 0 auto; text-align: center; }
+  .contacto-sub { color: var(--muted); font-size: 14px; letter-spacing: 2px; margin-bottom: 64px; text-transform: uppercase; margin-top: 16px; }
+  .form-wrapper { text-align: left; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; margin-bottom: 2px; }
+  .form-group { position: relative; background: var(--surface); }
+  .form-group.full { grid-column: span 2; }
+  .form-label { position: absolute; top: 20px; left: 24px; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); transition: all .3s; pointer-events: none; }
+  .form-input, .form-select, .form-textarea { width: 100%; padding: 32px 24px 14px; background: transparent; border: none; border-bottom: 1px solid var(--border); color: var(--white); font-family: 'Inter', sans-serif; font-size: 14px; outline: none; transition: border-color .3s; }
+  .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--silver); }
+  .form-input:focus ~ .form-label, .form-input:not(:placeholder-shown) ~ .form-label,
+  .form-textarea:focus ~ .form-label, .form-textarea:not(:placeholder-shown) ~ .form-label { top: 10px; font-size: 9px; color: var(--silver); }
+  .form-input::placeholder, .form-textarea::placeholder { color: transparent; }
+  .form-select { cursor: none; color: var(--silver); }
+  .form-select option { background: var(--deep); }
+  .form-textarea { min-height: 140px; resize: none; }
+  .form-submit { margin-top: 2px; width: 100%; padding: 20px; background: var(--white); color: var(--black); border: none; font-family: 'Inter', sans-serif; font-size: 11px; letter-spacing: 4px; text-transform: uppercase; font-weight: 700; cursor: none; position: relative; overflow: hidden; transition: background .3s; }
+  .form-submit::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,.3), transparent); transform: translateX(-100%); transition: transform .6s; }
+  .form-submit:hover::before { transform: translateX(100%); }
+  .form-submit:hover { background: var(--silver); }
+
+  /* TOAST */
+  .toast { position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--white); color: var(--black); padding: 16px 40px; font-size: 11px; letter-spacing: 3px; text-transform: uppercase; font-weight: 600; z-index: 9999; transition: transform .5s ease; white-space: nowrap; }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* FOOTER */
+  footer { border-top: 1px solid var(--border); padding: 48px; display: flex; justify-content: space-between; align-items: center; }
+  .footer-logo { display: flex; align-items: center; gap: 12px; }
+  .footer-logo-text { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 6px; background: linear-gradient(135deg, var(--muted), var(--silver)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .footer-links { display: flex; gap: 32px; }
+  .footer-links a { color: var(--muted); text-decoration: none; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; transition: color .3s; }
+  .footer-links a:hover { color: var(--silver); }
+  .footer-copy { font-size: 11px; color: var(--muted); letter-spacing: 1px; }
+
+  /* SIDE DOTS */
+  .side-bar { position: fixed; left: 20px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 8px; z-index: 50; }
+  .side-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--border); transition: all .3s; }
+  .side-dot.active { background: var(--silver); height: 20px; border-radius: 2px; }
+
+  /* LOADER */
+  .loader { position: fixed; inset: 0; background: var(--black); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 32px; transition: opacity .8s ease, visibility .8s ease; }
+  .loader.hidden { opacity: 0; visibility: hidden; }
+  .loader-diamond { animation: loaderPulse 1.2s ease-in-out infinite; }
+  @keyframes loaderPulse { 0%,100%{filter:drop-shadow(0 0 8px rgba(192,192,192,.2))} 50%{filter:drop-shadow(0 0 28px rgba(192,192,192,.7))} }
+  .loader-logo-text { font-family: 'Bebas Neue', sans-serif; font-size: 56px; letter-spacing: 16px; overflow: hidden; display: flex; }
+  .loader-logo-text span { display: inline-block; opacity: 0; transform: translateY(60px); animation: letterIn .5s ease forwards; }
+  @keyframes letterIn { to { opacity: 1; transform: translateY(0); } }
+  .loader-bar { width: 160px; height: 1px; background: var(--border); position: relative; overflow: hidden; }
+  .loader-bar::after { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, var(--silver), transparent); animation: loaderSweep 1s ease .6s forwards; }
+  @keyframes loaderSweep { to { left: 100%; } }
+
+  /* MOBILE */
+  @media (max-width: 768px) {
+    nav { padding: 16px 24px; }
+    .nav-links { display: none; }
+    section { padding: 80px 24px; }
+    #historia { grid-template-columns: 1fr; }
+    .historia-visual { display: none; }
+    .catalogo-grid { grid-template-columns: 1fr 1fr; }
+    .product-card:first-child { grid-row: auto; grid-column: span 2; }
+    .lookbook-grid { grid-template-columns: 1fr 1fr; }
+    .look-item:nth-child(1), .look-item:nth-child(4) { grid-column: span 2; }
+    .form-row { grid-template-columns: 1fr; }
+    .form-group.full { grid-column: span 1; }
+    footer { flex-direction: column; gap: 24px; text-align: center; }
+    .footer-links { flex-wrap: wrap; justify-content: center; }
+    .side-bar, .cursor, .cursor-ring { display: none; }
+    body { cursor: auto; }
+    .catalogo-header { flex-direction: column; align-items: flex-start; gap: 16px; }
+    .hero-cta { flex-direction: column; align-items: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div class="loader" id="loader">
+  <div class="loader-diamond">
+    <!-- ===== LOGO ROMBO — Reemplaza este SVG con tu logo real ===== -->
+    <svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="32,2 62,32 32,62 2,32"
+        fill="none" stroke="#c0c0c0" stroke-width="1.5"/>
+      <polygon points="32,10 54,32 32,54 10,32"
+        fill="none" stroke="#c0c0c0" stroke-width=".6" opacity=".4"/>
+      <line x1="32" y1="2" x2="32" y2="62" stroke="#c0c0c0" stroke-width=".4" opacity=".2"/>
+      <line x1="2" y1="32" x2="62" y2="32" stroke="#c0c0c0" stroke-width=".4" opacity=".2"/>
+    </svg>
+  </div>
+  <div class="loader-logo-text">
+    <span style="animation-delay:.1s">T</span>
+    <span style="animation-delay:.2s">O</span>
+    <span style="animation-delay:.3s">R</span>
+    <span style="animation-delay:.4s">M</span>
+    <span style="animation-delay:.5s">E</span>
+    <span style="animation-delay:.6s">N</span>
+    <span style="animation-delay:.7s">T</span>
+    <span style="animation-delay:.8s">O</span>
+  </div>
+  <div class="loader-bar"></div>
+</div>
+
+<!-- CURSOR -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav id="navbar">
+  <a href="#hero" class="nav-logo">
+    <!-- ===== LOGO NAV PEQUEÑO ===== -->
+    <svg class="nav-logo-diamond" width="22" height="22" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="32,2 62,32 32,62 2,32" fill="none" stroke="#c0c0c0" stroke-width="2.5"/>
+      <polygon points="32,14 50,32 32,50 14,32" fill="none" stroke="#c0c0c0" stroke-width="1" opacity=".5"/>
+    </svg>
+    <span class="nav-logo-text">TORMENTO</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#historia-section">Historia</a></li>
+    <li><a href="#catalogo-section">Catálogo</a></li>
+    <li><a href="#lookbook">Lookbook</a></li>
+    <li><a href="#contacto-section">Contacto</a></li>
+  </ul>
+</nav>
+
+<!-- SIDE DOTS -->
+<div class="side-bar" id="sideDots">
+  <div class="side-dot active"></div>
+  <div class="side-dot"></div>
+  <div class="side-dot"></div>
+  <div class="side-dot"></div>
+  <div class="side-dot"></div>
+</div>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="grid-lines"></div>
+  <div class="particles" id="particles"></div>
+
+  <!-- ===== LOGO HERO GRANDE ===== -->
+  <div class="hero-diamond-wrap">
+    <svg class="hero-diamond" width="100" height="100" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="32,2 62,32 32,62 2,32"
+        fill="none" stroke="url(#dgrad)" stroke-width="1.5"/>
+      <polygon points="32,10 54,32 32,54 10,32"
+        fill="none" stroke="#c0c0c0" stroke-width=".6" opacity=".5"/>
+      <polygon points="32,18 46,32 32,46 18,32"
+        fill="none" stroke="#c0c0c0" stroke-width=".4" opacity=".25"/>
+      <line x1="32" y1="2" x2="32" y2="62" stroke="#c0c0c0" stroke-width=".3" opacity=".15"/>
+      <line x1="2" y1="32" x2="62" y2="32" stroke="#c0c0c0" stroke-width=".3" opacity=".15"/>
+      <defs>
+        <linearGradient id="dgrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#888"/>
+          <stop offset="50%" stop-color="#fff"/>
+          <stop offset="100%" stop-color="#888"/>
+        </linearGradient>
+      </defs>
+    </svg>
+  </div>
+
+  <!-- ===== TEXTO HERO — edita aquí el eslogan ===== -->
+  <p class="hero-eyebrow">Concepción, Chile — Vestuario Urbano</p>
+  <h1 class="hero-title">
+    <span class="reflect-text">TORMENTO</span>
+  </h1>
+  <p class="hero-sub">No es solo ropa.<br>Es identidad. Es presencia. Es luz.</p>
+  <div class="hero-cta">
+    <a href="#catalogo-section" class="btn-primary">Ver Catálogo</a>
+    <a href="#historia-section" class="btn-outline">Nuestra Historia</a>
+  </div>
+  <div class="hero-scroll"><span>Scroll</span><div class="scroll-line"></div></div>
+</section>
+
+<!-- HISTORIA -->
+<section id="historia-section" style="padding-top:120px; padding-bottom:120px;">
+  <div id="historia">
+    <div class="historia-visual reveal">
+      <div class="historia-visual-inner"></div>
+      <div class="reflect-sweep"></div>
+      <!-- Rombo decorativo en la visual -->
+      <div class="historia-visual-logo">
+        <svg width="180" height="180" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="32,2 62,32 32,62 2,32" fill="none" stroke="#c0c0c0" stroke-width="1"/>
+          <polygon points="32,10 54,32 32,54 10,32" fill="none" stroke="#c0c0c0" stroke-width=".5" opacity=".5"/>
+          <polygon points="32,18 46,32 32,46 18,32" fill="none" stroke="#c0c0c0" stroke-width=".3" opacity=".3"/>
+        </svg>
+      </div>
+      <div class="historia-visual-label">TRMNT</div>
+      <div class="historia-tag">Reflectante</div>
+    </div>
+    <div class="historia-content reveal">
+      <div class="section-eyebrow">Nuestra Historia</div>
+      <!-- ===== TEXTOS HISTORIA — edita aquí ===== -->
+      <h2 class="section-title">MÁS QUE<br>UNA PRENDA</h2>
+      <p class="historia-text">Tormento nació en Concepción con una idea simple: la ropa urbana no tenía que elegir entre estética y funcionalidad. Podía tener ambas.</p>
+      <p class="historia-text">Cada prenda está diseñada para transformarse bajo la luz — de invisible a impactante en una fracción de segundo. Ese efecto no es decorativo. Es una declaración.</p>
+      <p class="historia-text">Producción controlada, materiales de alto gramaje, vinilo textil reflectante aplicado a mano. Nada de producción masiva. Nada de lo que todos usan.</p>
+      <div class="historia-stats">
+        <!-- ===== ESTADÍSTICAS — edita números y etiquetas ===== -->
+        <div class="stat-item"><span class="stat-number">+150</span><span class="stat-label">Unidades vendidas</span></div>
+        <div class="stat-item"><span class="stat-number">100%</span><span class="stat-label">Hecho en CCP</span></div>
+        <div class="stat-item"><span class="stat-number">D2C</span><span class="stat-label">Venta directa</span></div>
+        <div class="stat-item"><span class="stat-number">24H</span><span class="stat-label">Respuesta garantizada</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CATÁLOGO -->
+<section id="catalogo-section" style="background: var(--deep); padding-top:120px; padding-bottom:120px;">
+  <div id="catalogo">
+    <div class="catalogo-header reveal">
+      <div>
+        <div class="section-eyebrow">Productos</div>
+        <h2 class="section-title">CATÁLOGO</h2>
+      </div>
+      <!-- ===== SUBTÍTULO CATÁLOGO ===== -->
+      <p style="color:var(--muted);font-size:13px;letter-spacing:1px;max-width:240px;text-align:right;line-height:1.8;">Producción limitada.<br>Una vez agotado, no repone.</p>
+    </div>
+    <div class="catalogo-grid reveal">
+
+      <!-- ===== PRODUCTO 1 — POLERÓN ===== -->
+      <!-- Para cambiar nombre/precio: edita product-name y product-price -->
+      <!-- Para cambiar imagen: reemplaza el div product-visual por un <img> -->
+      <div class="product-card">
+        <div class="product-visual">
+          <div class="product-icon">TRMNT<br>POLERÓN</div>
+        </div>
+        <div class="product-badge reflectante">Reflectante</div>
+        <button class="product-add" onclick="initPedido('Polerón Reflectante','$40.000')">Pedir ahora</button>
+        <div class="product-info">
+          <span class="product-name">Polerón Reflectante</span>
+          <span class="product-price">$40.000</span>
+        </div>
+      </div>
+
+      <!-- ===== PRODUCTO 2 — CROP TOP ===== -->
+      <div class="product-card">
+        <div class="product-visual">
+          <div class="product-icon">CROP<br>TOP</div>
+        </div>
+        <div class="product-badge nuevo">Nuevo</div>
+        <button class="product-add" onclick="initPedido('Crop Top Reflectante','Precio por confirmar')">Pre-registro</button>
+        <div class="product-info">
+          <span class="product-name">Crop Top Reflectante</span>
+          <span class="product-price">Próximo</span>
+        </div>
+      </div>
+
+      <!-- ===== PRODUCTO 3 — BUCKET HAT ===== -->
+      <div class="product-card">
+        <div class="product-visual">
+          <div class="product-icon">BUCKET<br>HAT</div>
+        </div>
+        <div class="product-badge nuevo">Próximo</div>
+        <button class="product-add" onclick="initPedido('Bucket Hat Reflectante','Precio por confirmar')">Notificarme</button>
+        <div class="product-info">
+          <span class="product-name">Bucket Hat</span>
+          <span class="product-price">Próximo</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LOOKBOOK -->
+<section id="lookbook" style="padding-top:120px; padding-bottom:120px;">
+  <div class="lookbook-inner">
+    <div class="lookbook-header reveal">
+      <div class="section-eyebrow">Galería</div>
+      <h2 class="section-title">LOOKBOOK</h2>
+    </div>
+    <!-- ===== LOOKBOOK — Para agregar fotos reales:
+         Reemplaza cada <div class="look-visual"> por:
+         <div class="look-visual" style="background-image:url('tu-foto.jpg'); background-size:cover; background-position:center;">
+         ===== -->
+    <div class="lookbook-grid reveal">
+      <div class="look-item">
+        <div class="look-visual"><div class="look-bg-text">TRMNT</div><div class="look-placeholder">Campaña principal</div></div>
+        <div class="look-overlay"><span class="look-overlay-text">Colección Principal — 2025</span></div>
+      </div>
+      <div class="look-item">
+        <div class="look-visual"><div class="look-placeholder">Detalle reflectante</div></div>
+        <div class="look-overlay"><span class="look-overlay-text">Detalle vinilo</span></div>
+      </div>
+      <div class="look-item">
+        <div class="look-visual"><div class="look-placeholder">Shot nocturno</div></div>
+        <div class="look-overlay"><span class="look-overlay-text">Shot nocturno</span></div>
+      </div>
+      <div class="look-item">
+        <div class="look-visual"><div class="look-bg-text">CCP</div><div class="look-placeholder">Crop Top — Nuevo</div></div>
+        <div class="look-overlay"><span class="look-overlay-text">Crop Top Reflectante</span></div>
+      </div>
+      <div class="look-item">
+        <div class="look-visual"><div class="look-placeholder">Cliente real</div></div>
+        <div class="look-overlay"><span class="look-overlay-text">Cliente — Concepción</span></div>
+      </div>
+      <div class="look-item">
+        <div class="look-visual"><div class="look-placeholder">Flash urbano</div></div>
+        <div class="look-overlay"><span class="look-overlay-text">Flash — Ambiente urbano</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACTO -->
+<section id="contacto-section" style="background: var(--deep); padding-top:120px; padding-bottom:120px;">
+  <div id="contacto">
+    <div class="reveal">
+      <div class="section-eyebrow" style="justify-content:center;">Contacto</div>
+      <!-- ===== TÍTULO Y SUBTÍTULO CONTACTO — edita aquí ===== -->
+      <h2 class="section-title" style="margin-bottom:0;">HAGAMOS<br>UN PEDIDO</h2>
+      <p class="contacto-sub">Respondemos en menos de 24 horas</p>
+    </div>
+    <div class="form-wrapper reveal">
+      <div class="form-row">
+        <div class="form-group">
+          <input type="text" class="form-input" id="f-nombre" placeholder="x" autocomplete="off">
+          <label for="f-nombre" class="form-label">Nombre</label>
+        </div>
+        <div class="form-group">
+          <input type="text" class="form-input" id="f-ciudad" placeholder="x" autocomplete="off">
+          <label for="f-ciudad" class="form-label">Ciudad</label>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <input type="email" class="form-input" id="f-email" placeholder="x" autocomplete="off">
+          <label for="f-email" class="form-label">Email</label>
+        </div>
+        <div class="form-group">
+          <input type="tel" class="form-input" id="f-telefono" placeholder="x" autocomplete="off">
+          <label for="f-telefono" class="form-label">Teléfono / WhatsApp</label>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group full">
+          <select class="form-select" id="f-producto">
+            <option value="" disabled selected>— Selecciona un producto —</option>
+            <!-- ===== OPCIONES DEL FORMULARIO — edita según tu catálogo ===== -->
+            <option value="Polerón Reflectante — $40.000">Polerón Reflectante — $40.000</option>
+            <option value="Crop Top Reflectante — Precio por confirmar">Crop Top Reflectante — Próximo lanzamiento</option>
+            <option value="Consulta general">Consulta / Otro</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group full">
+          <textarea class="form-textarea" id="f-mensaje" placeholder="x" maxlength="500"></textarea>
+          <label for="f-mensaje" class="form-label">Mensaje (talla, color, dudas…)</label>
+        </div>
+      </div>
+
+      <!-- PAGO -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:2px; margin-bottom:2px;">
+        <!-- ===== BOTÓN TRANSFERENCIA — el formulario enviará email ===== -->
+        <button class="form-submit" onclick="submitForm('transferencia')" style="background:var(--surface);color:var(--silver);border:1px solid var(--border);">
+          Pagar por Transferencia
+        </button>
+        <!-- ===== BOTÓN MERCADOPAGO — reemplaza el link con tu link real ===== -->
+        <button class="form-submit" onclick="submitForm('mercadopago')">
+          Pagar con MercadoPago
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">
+    <svg width="20" height="20" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="32,2 62,32 32,62 2,32" fill="none" stroke="#666" stroke-width="2"/>
+      <polygon points="32,14 50,32 32,50 14,32" fill="none" stroke="#666" stroke-width="1" opacity=".5"/>
+    </svg>
+    <!-- ===== NOMBRE FOOTER ===== -->
+    <span class="footer-logo-text">TORMENTO</span>
+  </div>
+  <div class="footer-links">
+    <!-- ===== LINKS FOOTER — actualiza el href de Instagram ===== -->
+    <a href="https://instagram.com/tormento.cl" target="_blank">@tormento.cl</a>
+    <a href="#catalogo-section">Catálogo</a>
+    <a href="#contacto-section">Pedidos</a>
+  </div>
+  <!-- ===== AÑO Y CIUDAD ===== -->
+  <div class="footer-copy">© 2025 Tormento — Concepción, Chile</div>
+</footer>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+  // ================================================================
+  // CONFIGURACIÓN — EDITA ESTOS VALORES
+  // ================================================================
+  const CONFIG = {
+    // ===== TU EMAIL — los pedidos llegan aquí =====
+    emailDestino: 'tucorreo@gmail.com',
+
+    // ===== LINK DE MERCADOPAGO — tu link de cobro =====
+    // Ejemplo: 'https://mpago.la/xxxxxxx'
+    mercadoPagoLink: 'https://mpago.la/REEMPLAZA-CON-TU-LINK',
+
+    // ===== INSTAGRAM =====
+    instagram: 'https://instagram.com/tormento.cl',
+  };
+  // ================================================================
+
+  // LOADER
+  window.addEventListener('load', () => {
+    setTimeout(() => document.getElementById('loader').classList.add('hidden'), 2000);
+  });
+
+  // CURSOR
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
+  });
+  (function animRing() {
+    rx += (mx - rx) * .12; ry += (my - ry) * .12;
+    ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+    requestAnimationFrame(animRing);
+  })();
+
+  // PARTICLES
+  const pc = document.getElementById('particles');
+  for (let i = 0; i < 40; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.cssText = `left:${Math.random()*100}%;top:${20+Math.random()*70}%;--dur:${3+Math.random()*4}s;--delay:${Math.random()*5}s;width:${1+Math.random()*2}px;height:${1+Math.random()*2}px;`;
+    pc.appendChild(p);
+  }
+
+  // SCROLL REVEAL
+  new IntersectionObserver((entries) => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) setTimeout(() => e.target.classList.add('visible'), i * 80);
+    });
+  }, { threshold: .1 }).observe !== undefined &&
+  document.querySelectorAll('.reveal').forEach(el =>
+    new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: .1 }).observe(el)
+  );
+
+  // NAV SCROLL
+  window.addEventListener('scroll', () => {
+    document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 60);
+  });
+
+  // HERO mouse shimmer
+  const heroEl = document.getElementById('hero');
+  const reflectEl = document.querySelector('.reflect-text');
+  heroEl && heroEl.addEventListener('mousemove', e => {
+    const r = heroEl.getBoundingClientRect();
+    reflectEl.style.backgroundPosition = `${((e.clientX-r.left)/r.width)*100}% ${((e.clientY-r.top)/r.height)*100}%`;
+  });
+
+  // TOAST
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 4000);
+  }
+
+  // INIT PEDIDO desde catálogo (rellena el formulario y hace scroll)
+  function initPedido(producto, precio) {
+    document.getElementById('f-producto').value = producto + ' — ' + precio;
+    document.querySelector('#contacto-section').scrollIntoView({ behavior: 'smooth' });
+    showToast('Seleccionado: ' + producto);
+  }
+
+  // SUBMIT FORM — envía email vía mailto o redirige a MercadoPago
+  function submitForm(metodo) {
+    const nombre = document.getElementById('f-nombre').value.trim();
+    const email  = document.getElementById('f-email').value.trim();
+    const tel    = document.getElementById('f-telefono').value.trim();
+    const prod   = document.getElementById('f-producto').value;
+    const ciudad = document.getElementById('f-ciudad').value.trim();
+    const msg    = document.getElementById('f-mensaje').value.trim();
+
+    if (!nombre || !email || !prod) {
+      showToast('Completa nombre, email y producto');
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      showToast('Email inválido');
+      return;
+    }
+
+    const cuerpo = [
+      '🖤 NUEVO PEDIDO TORMENTO',
+      '',
+      'Nombre: ' + nombre,
+      'Email: ' + email,
+      'Teléfono: ' + (tel || '—'),
+      'Ciudad: ' + (ciudad || '—'),
+      'Producto: ' + prod,
+      'Método de pago: ' + (metodo === 'mercadopago' ? 'MercadoPago' : 'Transferencia'),
+      '',
+      'Mensaje:',
+      msg || '(sin mensaje)',
+    ].join('\n');
+
+    // Abre cliente de correo con el pedido pre-llenado
+    const mailtoLink = `mailto:${CONFIG.emailDestino}?subject=${encodeURIComponent('Pedido Tormento — ' + prod)}&body=${encodeURIComponent(cuerpo)}`;
+    window.open(mailtoLink, '_blank');
+
+    if (metodo === 'mercadopago') {
+      setTimeout(() => window.open(CONFIG.mercadoPagoLink, '_blank'), 600);
+      showToast('¡Abriendo MercadoPago! Revisa tu correo también 🖤');
+    } else {
+      showToast('¡Pedido listo! Revisa tu correo para enviarlo 🖤');
+    }
+  }
+</script>
+</body>
+</html>
