@@ -1,0 +1,9 @@
+[[redirects]]
+  from = "/tormento"
+  to = "/"
+  status = 200
+
+[[redirects]]
+  from = "/tormento.html"
+  to = "/tormento"
+  status = 301
