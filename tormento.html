@@ -621,6 +621,45 @@ footer{border-top:1px solid var(--border);padding:40px 48px;display:flex;justify
           <label class="form-label" for="f-mensaje">Mensaje (talla, color, dudas…)</label>
         </div>
       </div>
+
+      <!-- DATOS DE ENVÍO STARKEN -->
+      <div style="padding:16px 20px;background:var(--surface2);border-bottom:1px solid var(--border);margin-bottom:2px">
+        <div style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--gris-med);font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:10px">
+          <span>Datos de envío Starken</span>
+          <span style="flex:1;height:1px;background:var(--border);display:block"></span>
+          <span style="font-size:8px;color:var(--gris-osc);letter-spacing:1px;font-weight:400">opcional</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-bottom:2px">
+          <div class="form-group">
+            <input type="text" class="form-input" id="f-destinatario" placeholder="x" autocomplete="off">
+            <label class="form-label" for="f-destinatario">Nombre destinatario</label>
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-input" id="f-rut-dest" placeholder="x" autocomplete="off">
+            <label class="form-label" for="f-rut-dest">RUT destinatario</label>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-bottom:2px">
+          <div class="form-group">
+            <input type="text" class="form-input" id="f-direccion" placeholder="x" autocomplete="off">
+            <label class="form-label" for="f-direccion">Dirección completa</label>
+          </div>
+          <div class="form-group">
+            <input type="text" class="form-input" id="f-comuna" placeholder="x" autocomplete="off">
+            <label class="form-label" for="f-comuna">Comuna</label>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px">
+          <div class="form-group">
+            <input type="text" class="form-input" id="f-region" placeholder="x" autocomplete="off">
+            <label class="form-label" for="f-region">Región</label>
+          </div>
+          <div class="form-group">
+            <input type="tel" class="form-input" id="f-tel-dest" placeholder="x" autocomplete="off">
+            <label class="form-label" for="f-tel-dest">Teléfono destinatario</label>
+          </div>
+        </div>
+      </div>
       <!-- CUPÓN DE DESCUENTO -->
       <div class="form-row" style="margin-bottom:2px">
         <div class="form-group" style="display:flex;align-items:stretch">
@@ -637,8 +676,38 @@ footer{border-top:1px solid var(--border);padding:40px 48px;display:flex;justify
       </div>
       <div id="cupon-msg" style="display:none;padding:8px 20px;font-size:9px;letter-spacing:2px;text-transform:uppercase;font-weight:700;margin-bottom:2px"></div>
       <div class="form-btn-row">
-        <button class="form-submit secondary" onclick="submitForm('transferencia')">Transferencia Bancaria</button>
-        <button class="form-submit" onclick="submitForm('mercadopago')">MercadoPago →</button>
+        <button class="form-submit secondary" onclick="submitForm('transferencia');toggleTransferencia(true)">Transferencia Bancaria</button>
+        <button class="form-submit" onclick="submitForm('mercadopago');toggleTransferencia(false)">MercadoPago →</button>
+      </div>
+
+      <!-- DATOS DE TRANSFERENCIA — visible solo al elegir esa opción -->
+      <div id="datos-transferencia" style="display:none;background:var(--surface2);border:1px solid var(--border);border-top:none;padding:20px 24px">
+        <div style="font-size:8px;letter-spacing:3px;text-transform:uppercase;color:var(--gris-med);font-weight:700;margin-bottom:14px">Datos para transferencia</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div>
+            <div style="font-size:8px;color:var(--gris-med);letter-spacing:1px;margin-bottom:4px">Nombre</div>
+            <div style="font-size:12px;color:var(--reflectivo);font-weight:500">Jared Alonso Cifuentes Collao</div>
+          </div>
+          <div>
+            <div style="font-size:8px;color:var(--gris-med);letter-spacing:1px;margin-bottom:4px">RUT</div>
+            <div style="font-size:12px;color:var(--reflectivo);font-weight:500">19.107.899-3</div>
+          </div>
+          <div>
+            <div style="font-size:8px;color:var(--gris-med);letter-spacing:1px;margin-bottom:4px">Banco</div>
+            <div style="font-size:12px;color:var(--reflectivo);font-weight:500">Mercado Pago — Cuenta Vista</div>
+          </div>
+          <div>
+            <div style="font-size:8px;color:var(--gris-med);letter-spacing:1px;margin-bottom:4px">N° Cuenta</div>
+            <div style="font-size:12px;color:var(--reflectivo);font-weight:500">1179444637</div>
+          </div>
+          <div style="grid-column:span 2">
+            <div style="font-size:8px;color:var(--gris-med);letter-spacing:1px;margin-bottom:4px">Email para comprobante</div>
+            <div style="font-size:12px;color:var(--metalico);font-weight:500">jared.aukan@gmail.com</div>
+          </div>
+        </div>
+        <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);font-size:9px;color:var(--gris-med);letter-spacing:1px;line-height:1.8">
+          Envía el comprobante de transferencia a <strong style="color:var(--metalico)">tormento.gear@gmail.com</strong> junto con tu nombre y pedido. Coordinamos el envío en menos de 24 horas.
+        </div>
       </div>
       <div class="contact-info">
         <div class="contact-item">
@@ -753,7 +822,15 @@ footer{border-top:1px solid var(--border);padding:40px 48px;display:flex;justify
 // CONFIG
 const CONFIG = {
   email: 'tormento.gear@gmail.com',
-  mpLink: 'https://mpago.la/REEMPLAZA-CON-TU-LINK',
+  mpLink: 'https://link.mercadopago.cl/trmnt',
+  // Datos transferencia
+  transferencia: {
+    nombre: 'Jared Alonso Cifuentes Collao',
+    rut: '19.107.899-3',
+    banco: 'Mercado Pago — Cuenta Vista',
+    cuenta: '1179444637',
+    email: 'jared.aukan@gmail.com',
+  },
   // ===== CUPONES — agrega o edita aquí =====
   cupones: {
     'TORMENTO10': { descuento: 10, label: '10% de descuento aplicado' },
@@ -835,6 +912,12 @@ function aplicarCupon(){
     msg.textContent='✕ Cupón no válido';
     showToast('Cupón no reconocido');
   }
+}
+
+// MOSTRAR/OCULTAR DATOS DE TRANSFERENCIA
+function toggleTransferencia(mostrar){
+  const el=document.getElementById('datos-transferencia');
+  if(el) el.style.display=mostrar?'block':'none';
 }
 
 // SELECCIÓN DE TALLA con precio variable
@@ -931,24 +1014,59 @@ function mostrarGracias(prod, metodo){
 
 // SUBMIT FORM
 function submitForm(metodo){
-  const nombre=document.getElementById('f-nombre').value.trim();
-  const email=document.getElementById('f-email').value.trim();
-  const tel=document.getElementById('f-telefono').value.trim();
-  const prod=document.getElementById('f-producto').value;
-  const ciudad=document.getElementById('f-ciudad').value.trim();
-  const msg=document.getElementById('f-mensaje').value.trim();
+  const nombre     = document.getElementById('f-nombre').value.trim();
+  const email      = document.getElementById('f-email').value.trim();
+  const tel        = document.getElementById('f-telefono').value.trim();
+  const prod       = document.getElementById('f-producto').value;
+  const ciudad     = document.getElementById('f-ciudad').value.trim();
+  const msg        = document.getElementById('f-mensaje').value.trim();
+  // Envío
+  const destinatario = document.getElementById('f-destinatario').value.trim();
+  const rutDest      = document.getElementById('f-rut-dest').value.trim();
+  const direccion    = document.getElementById('f-direccion').value.trim();
+  const comuna       = document.getElementById('f-comuna').value.trim();
+  const region       = document.getElementById('f-region').value.trim();
+  const telDest      = document.getElementById('f-tel-dest').value.trim();
+
   if(!nombre||!email||!prod){showToast('Completa nombre, email y producto');return}
   if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){showToast('Email inválido');return}
 
-  const cuponInfo=cuponAplicado
-    ? `\nCupón: ${cuponAplicado.code} (${cuponAplicado.descuento}% descuento)`
-    : '\nCupón: Sin cupón';
+  const cuponInfo = cuponAplicado
+    ? `Cupón aplicado: ${cuponAplicado.code} — ${cuponAplicado.descuento}% de descuento`
+    : 'Sin cupón de descuento';
 
-  const body=[
+  const tieneEnvio = destinatario || direccion;
+  const envioInfo = tieneEnvio ? [
+    '',
+    '━━━━━━━━━━━━━━━━━━━━━━━━',
+    'DATOS DE ENVÍO STARKEN',
+    'Destinatario: '+(destinatario||'—'),
+    'RUT: '+(rutDest||'—'),
+    'Dirección: '+(direccion||'—'),
+    'Comuna: '+(comuna||'—'),
+    'Región: '+(region||'—'),
+    'Teléfono: '+(telDest||'—'),
+  ].join('\n') : '\nSin datos de envío (retiro o coordinar)';
+
+  // Datos de transferencia para incluir en el correo
+  const transInfo = metodo === 'transferencia' ? [
+    '',
+    '━━━━━━━━━━━━━━━━━━━━━━━━',
+    'DATOS PARA TRANSFERENCIA',
+    'Nombre: '+CONFIG.transferencia.nombre,
+    'RUT: '+CONFIG.transferencia.rut,
+    'Banco: '+CONFIG.transferencia.banco,
+    'N° Cuenta: '+CONFIG.transferencia.cuenta,
+    'Email: '+CONFIG.transferencia.email,
+    '',
+    'Por favor enviar comprobante a: tormento.gear@gmail.com',
+  ].join('\n') : '';
+
+  const body = [
     '🖤 NUEVO PEDIDO TORMENTO',
     '━━━━━━━━━━━━━━━━━━━━━━━━',
     '',
-    'CLIENTE',
+    'DATOS DEL CLIENTE',
     'Nombre: '+nombre,
     'Email: '+email,
     'Teléfono: '+(tel||'—'),
@@ -958,34 +1076,38 @@ function submitForm(metodo){
     'Producto: '+prod,
     'Método de pago: '+(metodo==='mercadopago'?'MercadoPago':'Transferencia Bancaria'),
     cuponInfo,
+    envioInfo,
+    transInfo,
     '',
+    '━━━━━━━━━━━━━━━━━━━━━━━━',
     'MENSAJE DEL CLIENTE',
     msg||'(sin mensaje adicional)',
     '',
     '━━━━━━━━━━━━━━━━━━━━━━━━',
-    'Responder a: '+email,
+    'Responder directamente a: '+email,
   ].join('\n');
 
-  // Abrir cliente de correo con el pedido
+  // Abrir correo a Jared con todos los datos
   window.open(
-    `mailto:${CONFIG.email}?subject=${encodeURIComponent('🖤 Pedido Tormento — '+prod)}&body=${encodeURIComponent(body)}`,
+    `mailto:jared.aukan@gmail.com?subject=${encodeURIComponent('🖤 Nuevo pedido Tormento — '+prod)}&body=${encodeURIComponent(body)}`,
     '_blank'
   );
 
+  // Si es MercadoPago, abrir link de pago
   if(metodo==='mercadopago'){
-    setTimeout(()=>window.open(CONFIG.mpLink,'_blank'),600);
+    setTimeout(()=>window.open(CONFIG.mpLink,'_blank'), 700);
   }
 
   // Limpiar formulario
-  ['f-nombre','f-email','f-telefono','f-ciudad','f-mensaje'].forEach(id=>{
-    document.getElementById(id).value='';
-  });
+  ['f-nombre','f-email','f-telefono','f-ciudad','f-mensaje',
+   'f-destinatario','f-rut-dest','f-direccion','f-comuna','f-region','f-tel-dest'
+  ].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
   document.getElementById('f-producto').value='';
   document.getElementById('f-cupon').value='';
   document.getElementById('cupon-msg').style.display='none';
   cuponAplicado=null;
 
-  // Mostrar modal de agradecimiento
+  // Modal de agradecimiento
   mostrarGracias(prod, metodo);
 }
 </script>
